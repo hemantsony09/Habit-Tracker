@@ -2,7 +2,6 @@
 
 import { useAuth } from '@/src/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import '../auth.css'
 
@@ -87,9 +86,6 @@ export default function Login() {
                 </>
               )}
             </button>
-            <div className="auth-footer">
-              <p>Don't have an account? <Link href="/signup">Sign up</Link></p>
-            </div>
           </div>
         </div>
       </div>

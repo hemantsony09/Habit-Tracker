@@ -46,14 +46,24 @@ A beautiful web application for tracking daily habits and managing tasks, built 
    npm install
    ```
 
-3. **Set up Firebase:**
+3. **Set up environment variables:**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env.local
+   
+   # Edit .env.local with your Firebase credentials
+   # Get these from: Firebase Console → Project Settings → General → Your apps
+   ```
+
+4. **Set up Firebase:**
    - Go to [Firebase Console](https://console.firebase.google.com/)
    - Create a Firebase project (or use existing)
    - Enable **Google Authentication** in Authentication section
    - Create **Firestore Database** (start in test mode for development)
-   - The Firebase configuration is already set up in `src/firebase/config.js`
+   - Get your Firebase config values from Project Settings → General → Your apps
+   - Add these values to your `.env.local` file
 
-4. **Run the development server:**
+5. **Run the development server:**
    ```bash
    npm run dev
    ```
@@ -89,8 +99,15 @@ This will start the Next.js development server with hot-reload enabled.
 
 This Next.js app can be deployed to:
 - **Vercel** (recommended) - `vercel deploy`
+  - **Important:** Add all environment variables from `.env.local` to Vercel project settings
+  - Go to: Project Settings → Environment Variables
+  - Add each `NEXT_PUBLIC_*` variable from your `.env.local` file
 - **Netlify** - Connect your GitHub repository
+  - Add environment variables in Site Settings → Environment Variables
 - **Any Node.js hosting** - Run `npm run build && npm start`
+  - Make sure to set all environment variables in your hosting platform
+
+**Note:** Never commit `.env.local` to git. It's already in `.gitignore`.
 
 ## Data Storage
 
@@ -154,7 +171,9 @@ Habit Tracker/
 ## Troubleshooting
 
 ### Firebase Connection Issues
-- Verify your Firebase config values in `src/firebase/config.js`
+- Verify your Firebase config values in `.env.local` file
+- Make sure all required environment variables are set (see `.env.example`)
+- Ensure `.env.local` exists and contains all Firebase configuration
 - Make sure Google Authentication is enabled in Firebase Console
 - Check Firestore security rules (see FIREBASE_SETUP.md)
 - Ensure you're logged in before accessing data

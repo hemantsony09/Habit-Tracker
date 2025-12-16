@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, isToday, isPast, parseISO } from 'date-fns';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { getTasks, saveTask, deleteTask } from '@/src/services/firebaseApi';
@@ -38,13 +38,7 @@ function TaskList() {
     completed: false
   });
 
-  useEffect(() => {
-    if (currentUser) {
-      loadTasks();
-    }
-  }, [currentUser]);
-
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     if (!currentUser) return;
     try {
       const allTasks = await getTasks(currentUser.uid);
@@ -52,7 +46,13 @@ function TaskList() {
     } catch (error) {
       console.error('Error loading tasks:', error);
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      loadTasks();
+    }
+  }, [currentUser, loadTasks]);
 
   const handleSaveTask = async () => {
     if (!newTask.task.trim() || !currentUser) return;

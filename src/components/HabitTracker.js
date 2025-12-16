@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDaysInMonth } from 'date-fns';
 
 // Helper function to format 24-hour time to 12-hour AM/PM
@@ -51,15 +51,7 @@ function HabitTracker() {
   const [editingHabit, setEditingHabit] = useState(null);
   const [newHabit, setNewHabit] = useState({ name: '', icon: '✓', startTime: '', endTime: '', duration: '' });
 
-  useEffect(() => {
-    if (!currentUser) return;
-    // Load habits (start with empty list)
-    loadHabits();
-    loadCompletions();
-    loadDailyProgress();
-  }, [currentDate, currentUser]);
-
-  const loadHabits = async () => {
+  const loadHabits = useCallback(async () => {
     if (!currentUser) {
       setHabits([]);
       return;
@@ -74,9 +66,9 @@ function HabitTracker() {
       console.error('Error details:', error.code, error.message);
       setHabits([]);
     }
-  };
+  }, [currentUser]);
 
-  const loadCompletions = async () => {
+  const loadCompletions = useCallback(async () => {
     if (!currentUser) return;
     try {
       const month = currentDate.getMonth();
@@ -91,9 +83,9 @@ function HabitTracker() {
     } catch (error) {
       console.error('Error loading completions:', error);
     }
-  };
+  }, [currentUser, currentDate]);
 
-  const loadDailyProgress = async () => {
+  const loadDailyProgress = useCallback(async () => {
     if (!currentUser) {
       console.log('No current user, clearing daily progress');
       setDailyProgress({});
@@ -122,7 +114,15 @@ function HabitTracker() {
       console.error('Error details:', error.code, error.message);
       setDailyProgress({});
     }
-  };
+  }, [currentUser, currentDate]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    // Load habits (start with empty list)
+    loadHabits();
+    loadCompletions();
+    loadDailyProgress();
+  }, [currentUser, loadHabits, loadCompletions, loadDailyProgress]);
 
   const toggleCompletion = async (habitId, date) => {
     if (!currentUser) return;
@@ -506,28 +506,28 @@ function HabitTracker() {
           </div>
         </div>
         <div className="header-right-section">
-          <div className="header-actions">
-            <button className="add-habit-btn" onClick={handleAddHabit}>
-              + Add Habit
-            </button>
+        <div className="header-actions">
+          <button className="add-habit-btn" onClick={handleAddHabit}>
+            + Add Habit
+          </button>
+        </div>
+        <div className="summary-stats">
+          <div className="stat-item">
+            <span className="stat-label">Number of habits:</span>
+            <span className="stat-value">{totalHabits}</span>
           </div>
-          <div className="summary-stats">
-            <div className="stat-item">
-              <span className="stat-label">Number of habits:</span>
-              <span className="stat-value">{totalHabits}</span>
+          <div className="stat-item">
+            <span className="stat-label">Completed habits:</span>
+            <span className="stat-value">{completedCount}</span>
+          </div>
+          <div className="stat-item progress-bar-container">
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${overallProgress}%` }}
+              ></div>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Completed habits:</span>
-              <span className="stat-value">{completedCount}</span>
-            </div>
-            <div className="stat-item progress-bar-container">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${overallProgress}%` }}
-                ></div>
-              </div>
-              <span className="progress-text">Progress in %: {overallProgress.toFixed(2)}%</span>
+            <span className="progress-text">Progress in %: {overallProgress.toFixed(2)}%</span>
             </div>
           </div>
         </div>
@@ -675,7 +675,7 @@ function HabitTracker() {
 
       {habits.length === 0 ? (
         <div className="empty-habits">
-          <p>No habits yet. Click "Add Habit" to get started!</p>
+          <p>No habits yet. Click &quot;Add Habit&quot; to get started!</p>
         </div>
       ) : (
         <div className="habit-grid-container">
