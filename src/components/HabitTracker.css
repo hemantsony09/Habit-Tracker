@@ -174,6 +174,7 @@
   margin-bottom: 20px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .habit-grid {
@@ -206,6 +207,14 @@
   position: sticky;
   left: 0;
   z-index: 5;
+}
+
+/* Make sticky first column readable above scrolled content */
+.habit-name-col,
+.habit-name-cell,
+.summary-label,
+.mental-state-label {
+  box-shadow: 6px 0 8px -8px rgba(0, 0, 0, 0.25);
 }
 
 .habit-name-content {
@@ -447,6 +456,163 @@
 
 .chart-wrapper {
   height: 200px;
+}
+
+/* Responsive: Tablet */
+@media (max-width: 900px) {
+  .habit-tracker {
+    padding: 14px;
+  }
+
+  .habit-header {
+    align-items: stretch;
+  }
+
+  .month-controls h1 {
+    font-size: 22px;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .header-right-section {
+    align-items: stretch;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
+  }
+
+  .summary-stats {
+    gap: 16px;
+  }
+
+  .chart-wrapper {
+    height: 180px;
+  }
+
+  .habit-form {
+    min-width: 0;
+    width: calc(100vw - 32px);
+    max-width: 550px;
+  }
+
+  .icon-selector {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 600px) {
+  .habit-tracker {
+    padding: 12px;
+  }
+
+  .habit-header {
+    gap: 12px;
+  }
+
+  .month-controls {
+    width: 100%;
+  }
+
+  .year-navigation,
+  .month-navigation {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .month-navigation {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .month-controls h1 {
+    font-size: 20px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .header-right-section {
+    width: 100%;
+  }
+
+  .add-habit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .summary-stats {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .stat-item {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .progress-bar-container {
+    min-width: 0;
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  .habit-grid {
+    min-width: 720px;
+  }
+
+  .habit-name-col {
+    min-width: 160px;
+  }
+
+  .analysis-section,
+  .mental-state-section,
+  .chart-container {
+    padding: 14px;
+  }
+
+  .chart-wrapper {
+    height: 160px;
+  }
+
+  .time-inputs {
+    flex-direction: column;
+    align-items: stretch;
+    margin-left: 0;
+  }
+
+  .time-select,
+  .duration-select {
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .icon-selector {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
+  }
 }
 
 .analysis-section {

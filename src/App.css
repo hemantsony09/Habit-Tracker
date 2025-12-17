@@ -12,10 +12,14 @@
   background-color: #f5f5f5;
   border-bottom: 1px solid #e0e0e0;
   padding: 0 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .tab-navigation {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .tab-navigation button {
@@ -28,6 +32,7 @@
   font-weight: 500;
   color: #666;
   transition: all 0.2s;
+  border-radius: 8px 8px 0 0;
 }
 
 .tab-navigation button:hover {
@@ -45,6 +50,8 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .user-name {
@@ -73,6 +80,48 @@
   overflow: auto;
   padding: 20px;
   background-color: #ffffff;
+}
+
+/* Responsive: Tablet */
+@media (max-width: 900px) {
+  .app-header {
+    padding: 12px 14px;
+    align-items: flex-start;
+  }
+
+  .tab-navigation button {
+    padding: 10px 14px;
+  }
+
+  .content {
+    padding: 14px;
+  }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 600px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .tab-navigation {
+    width: 100%;
+  }
+
+  .tab-navigation button {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  .user-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .logout-btn {
+    padding: 10px 14px;
+  }
 }
 
 .user-info {

@@ -10,12 +10,15 @@
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e0e0e0;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 30px;
+  flex-wrap: wrap;
 }
 
 .date-display {
@@ -45,6 +48,7 @@
 .summary-boxes {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
 }
 
 .summary-box {
@@ -118,11 +122,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .filter-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .filter-buttons button {
@@ -232,6 +239,7 @@
   overflow-x: auto;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .task-table {
@@ -239,6 +247,79 @@
   border-collapse: collapse;
   background: white;
   min-width: 1000px;
+}
+
+/* Responsive: Tablet */
+@media (max-width: 900px) {
+  .task-list {
+    padding: 14px;
+  }
+
+  .task-header h1 {
+    font-size: 24px;
+  }
+
+  .progress-section {
+    padding: 12px;
+  }
+
+  .add-task-form .form-row {
+    flex-wrap: wrap;
+  }
+
+  .form-input:first-child {
+    flex: 1 1 100%;
+  }
+
+  .task-table {
+    min-width: 860px;
+  }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 600px) {
+  .task-list {
+    padding: 12px;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .task-header h1 {
+    font-size: 22px;
+  }
+
+  .summary-boxes {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .summary-box {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 140px;
+  }
+
+  .progress-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .progress-percentage {
+    min-width: 0;
+  }
+
+  .filter-buttons button {
+    padding: 10px 14px;
+  }
+
+  .add-task-btn {
+    width: 100%;
+  }
+
+  .task-table {
+    min-width: 780px;
+  }
 }
 
 .task-table thead {

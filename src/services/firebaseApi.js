@@ -209,12 +209,12 @@ export const saveHabitCompletion = async (userId, habitId, date, completed) => {
 export const getDailyProgress = async (userId, month, year) => {
   try {
     console.log('getDailyProgress called:', { userId, month, year });
-    const startDate = new Date(year, month, 1);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(year, month + 1, 0);
-    endDate.setHours(23, 59, 59, 999);
     
-    console.log('Date range:', { startDate, endDate });
+    // Create date range at UTC midnight to match how we store dates
+    const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+    const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
+    
+    console.log('Date range (UTC):', { startDate, endDate });
     
     const progressRef = getUserCollection(userId, 'dailyProgress');
     console.log('Daily progress collection path:', progressRef.path);
@@ -233,12 +233,23 @@ export const getDailyProgress = async (userId, month, year) => {
       return [];
     }
     
+    // Helper to convert date to local yyyy-MM-dd string (not UTC)
+    const toLocalDateString = (date) => {
+      const d = date instanceof Date ? date : new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const progressData = snapshot.docs.map(doc => {
       const data = doc.data();
       const docDate = data.date?.toDate ? data.date.toDate() : new Date(data.date);
+      // Use local date string, not UTC
+      const localDateStr = toLocalDateString(docDate);
       return {
         id: doc.id,
-        date: docDate.toISOString().split('T')[0],
+        date: localDateStr,
         mood: data.mood !== undefined ? data.mood : null,
         motivation: data.motivation !== undefined ? data.motivation : null
       };
@@ -259,15 +270,24 @@ export const saveDailyProgress = async (userId, date, mood, motivation) => {
   try {
     // Validate inputs
     validateUserId(userId);
-    const dateObj = validateDate(date);
-    dateObj.setHours(0, 0, 0, 0);
+    let dateObj = validateDate(date);
+    
+    // Get the local date components (what the user sees)
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth();
+    const day = dateObj.getDate();
+    
+    // Create date at UTC midnight for the target date to avoid timezone shifts
+    // This ensures the date stored matches what the user selected
+    dateObj = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+    
     const validatedMood = validateMentalState(mood, 'Mood');
     const validatedMotivation = validateMentalState(motivation, 'Motivation');
     
     console.log('saveDailyProgress called:', { userId, date, mood, motivation, dateType: typeof date });
     
-    console.log('Normalized date object:', dateObj);
-    console.log('Date ISO string:', dateObj.toISOString());
+    console.log('Normalized date object (UTC):', dateObj);
+    console.log('Target date string:', `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
     
     const progressRef = getUserCollection(userId, 'dailyProgress');
     console.log('Daily progress collection path:', progressRef.path);
