@@ -24,7 +24,17 @@ export default function Login() {
       await loginWithGoogle()
       router.push('/')
     } catch (err) {
-      setError(err.message || 'Failed to sign in with Google')
+      // Handle specific Firebase errors with user-friendly messages
+      if (err.code === 'auth/popup-closed-by-user') {
+        // User closed the popup - don't show an error, just reset loading state
+        setError('')
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Popup was blocked. Please allow popups for this site and try again.')
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        setError('')
+      } else {
+        setError(err.message || 'Failed to sign in with Google. Please try again.')
+      }
       setLoading(false)
     }
   }
