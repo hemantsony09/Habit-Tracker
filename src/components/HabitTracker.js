@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDaysInMonth } from 'date-fns';
 
-// Helper function to format 24-hour time to 12-hour AM/PM
 const formatTime12Hour = (time24) => {
   if (!time24) return '';
   const [hours, minutes] = time24.split(':');
@@ -57,13 +56,10 @@ function HabitTracker() {
       return;
     }
     try {
-      console.log('Loading habits for user:', currentUser.uid);
       const savedHabits = await getHabits(currentUser.uid);
-      console.log('Habits loaded from Firestore:', savedHabits);
       setHabits(savedHabits || []);
     } catch (error) {
       console.error('Error loading habits:', error);
-      console.error('Error details:', error.code, error.message);
       setHabits([]);
     }
   }, [currentUser]);
@@ -87,31 +83,24 @@ function HabitTracker() {
 
   const loadDailyProgress = useCallback(async () => {
     if (!currentUser) {
-      console.log('No current user, clearing daily progress');
       setDailyProgress({});
       return;
     }
     try {
       const month = currentDate.getMonth();
       const year = currentDate.getFullYear();
-      console.log('🔄 Loading daily progress for:', { month, year });
       const progress = await getDailyProgress(currentUser.uid, month, year);
-      console.log('✅ Daily progress loaded:', progress);
       const progressMap = {};
       progress.forEach(p => {
-        // Ensure date format matches exactly (yyyy-MM-dd)
         const dateKey = p.date;
         progressMap[dateKey] = { 
           mood: p.mood !== undefined ? p.mood : null, 
           motivation: p.motivation !== undefined ? p.motivation : null 
         };
       });
-      console.log('Progress map created:', progressMap);
-      console.log('Progress map keys:', Object.keys(progressMap));
       setDailyProgress(progressMap);
     } catch (error) {
       console.error('❌ Error loading daily progress:', error);
-      console.error('Error details:', error.code, error.message);
       setDailyProgress({});
     }
   }, [currentUser, currentDate]);
@@ -149,15 +138,12 @@ function HabitTracker() {
 
   const updateMood = async (date, value) => {
     if (!currentUser) {
-      console.warn('Cannot update mood: user not logged in');
       return;
     }
     const dateStr = format(date, 'yyyy-MM-dd');
     const current = dailyProgress[dateStr] || {};
     const moodValue = value ? parseInt(value) : null;
     const newProgress = { ...current, mood: moodValue };
-    
-    console.log('Updating mood:', { date: dateStr, dateObject: date, mood: moodValue, currentProgress: current });
     
     // Optimistically update UI
     setDailyProgress(prev => ({
@@ -167,15 +153,11 @@ function HabitTracker() {
     
     try {
       await saveDailyProgress(currentUser.uid, date, newProgress.mood, newProgress.motivation);
-      console.log('✅ Mood saved successfully to Firestore');
-      // Small delay before reload to ensure Firestore has updated
       setTimeout(async () => {
         await loadDailyProgress();
       }, 500);
     } catch (error) {
       console.error('❌ Error saving mood:', error);
-      console.error('Error code:', error.code, 'Error message:', error.message);
-      // Revert on error
       setDailyProgress(prev => ({
         ...prev,
         [dateStr]: current
@@ -185,15 +167,12 @@ function HabitTracker() {
 
   const updateMotivation = async (date, value) => {
     if (!currentUser) {
-      console.warn('Cannot update motivation: user not logged in');
       return;
     }
     const dateStr = format(date, 'yyyy-MM-dd');
     const current = dailyProgress[dateStr] || {};
     const motivationValue = value ? parseInt(value) : null;
     const newProgress = { ...current, motivation: motivationValue };
-    
-    console.log('Updating motivation:', { date: dateStr, dateObject: date, motivation: motivationValue, currentProgress: current });
     
     // Optimistically update UI
     setDailyProgress(prev => ({
@@ -203,15 +182,11 @@ function HabitTracker() {
     
     try {
       await saveDailyProgress(currentUser.uid, date, newProgress.mood, newProgress.motivation);
-      console.log('✅ Motivation saved successfully to Firestore');
-      // Small delay before reload to ensure Firestore has updated
       setTimeout(async () => {
         await loadDailyProgress();
       }, 500);
     } catch (error) {
       console.error('❌ Error saving motivation:', error);
-      console.error('Error code:', error.code, 'Error message:', error.message);
-      // Revert on error
       setDailyProgress(prev => ({
         ...prev,
         [dateStr]: current
@@ -292,21 +267,13 @@ function HabitTracker() {
     return null;
   });
 
-  console.log('Mental state data array:', mentalStateData);
-  console.log('Daily progress state:', dailyProgress);
-
-  // Prepare chart data - convert null to NaN for Chart.js
   const chartDataValues = mentalStateData.map(d => {
-    // Scale to percentage (1-10 scale becomes 10-100%)
     if (d === null || d === undefined || isNaN(d)) {
-      return NaN; // Chart.js uses NaN to skip points
+      return NaN;
     }
     const scaled = Number(d) * 10;
     return scaled;
   });
-
-  console.log('Chart data values:', chartDataValues);
-  console.log('Chart labels:', dailyProgressData.map(d => d.date));
 
   const mentalStateChartData = {
     labels: dailyProgressData.map(d => d.date),

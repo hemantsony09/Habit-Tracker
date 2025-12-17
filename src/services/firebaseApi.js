@@ -208,16 +208,9 @@ export const saveHabitCompletion = async (userId, habitId, date, completed) => {
 // Daily progress operations
 export const getDailyProgress = async (userId, month, year) => {
   try {
-    console.log('getDailyProgress called:', { userId, month, year });
-    
-    // Create date range at UTC midnight to match how we store dates
     const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
     const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
-    
-    console.log('Date range (UTC):', { startDate, endDate });
-    
     const progressRef = getUserCollection(userId, 'dailyProgress');
-    console.log('Daily progress collection path:', progressRef.path);
     
     const q = query(
       progressRef,
@@ -226,14 +219,11 @@ export const getDailyProgress = async (userId, month, year) => {
     );
     
     const snapshot = await getDocs(q);
-    console.log('Daily progress documents found:', snapshot.size);
     
     if (snapshot.empty) {
-      console.log('No daily progress documents found for this month');
       return [];
     }
     
-    // Helper to convert date to local yyyy-MM-dd string (not UTC)
     const toLocalDateString = (date) => {
       const d = date instanceof Date ? date : new Date(date);
       const year = d.getFullYear();
@@ -254,21 +244,15 @@ export const getDailyProgress = async (userId, month, year) => {
         motivation: data.motivation !== undefined ? data.motivation : null
       };
     });
-    
-    console.log('Parsed daily progress:', progressData);
     return progressData;
   } catch (error) {
     console.error('❌ Error getting daily progress:', error);
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
     return [];
   }
 };
 
 export const saveDailyProgress = async (userId, date, mood, motivation) => {
   try {
-    // Validate inputs
     validateUserId(userId);
     let dateObj = validateDate(date);
     
@@ -283,17 +267,9 @@ export const saveDailyProgress = async (userId, date, mood, motivation) => {
     
     const validatedMood = validateMentalState(mood, 'Mood');
     const validatedMotivation = validateMentalState(motivation, 'Motivation');
-    
-    console.log('saveDailyProgress called:', { userId, date, mood, motivation, dateType: typeof date });
-    
-    console.log('Normalized date object (UTC):', dateObj);
-    console.log('Target date string:', `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
-    
     const progressRef = getUserCollection(userId, 'dailyProgress');
-    console.log('Daily progress collection path:', progressRef.path);
     
     const dateTimestamp = Timestamp.fromDate(dateObj);
-    console.log('Date timestamp:', dateTimestamp.toDate().toISOString());
     
     const progressQuery = query(
       progressRef,
@@ -301,44 +277,26 @@ export const saveDailyProgress = async (userId, date, mood, motivation) => {
     );
     
     const snapshot = await getDocs(progressQuery);
-    console.log('Existing progress documents found:', snapshot.size);
     
     if (snapshot.empty) {
-      // Create new progress
-      console.log('Creating new daily progress entry');
       const newProgress = {
         date: dateTimestamp,
         mood: validatedMood,
         motivation: validatedMotivation
       };
-      console.log('Progress data to save:', newProgress);
       const docRef = await addDoc(progressRef, newProgress);
-      console.log('✅ Daily progress created with ID:', docRef.id);
-      console.log('✅ Document path:', docRef.path);
       return docRef.id;
     } else {
-      // Update existing progress
-      console.log('Updating existing daily progress');
       const docRef = snapshot.docs[0].ref;
-      console.log('Document ID to update:', docRef.id);
-      const existingData = snapshot.docs[0].data();
-      console.log('Existing data:', existingData);
-      
       const updateData = {
         mood: validatedMood,
         motivation: validatedMotivation
       };
-      console.log('Progress data to update:', updateData);
       await updateDoc(docRef, updateData);
-      console.log('✅ Daily progress updated successfully');
-      console.log('✅ Updated document path:', docRef.path);
       return docRef.id;
     }
   } catch (error) {
     console.error('❌ Error saving daily progress:', error);
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
     throw error;
   }
 };
